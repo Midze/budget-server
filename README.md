@@ -10,3 +10,20 @@ Start the application
 Build and start the container
 
 `docker-compose up`
+
+### Automatic redeployment on the server
+
+For redeploying the docker image we are using [watchtower](https://containrrr.dev/watchtower/).
+
+To activate automatic redeployment, simply execute the following command on the server:
+
+```
+docker run -d \
+--name watchtower \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v /etc/localtime:/etc/localtime:ro \
+containrrr/watchtower \
+--cleanup \
+--remove-volumes \
+--interval 60
+```
