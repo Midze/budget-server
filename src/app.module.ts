@@ -23,7 +23,7 @@ import { expensesProviders } from './expenses/expenses.providers';
     ExpensesModule,
     DatabaseModule,
   ],
-  controllers: [AppController],
+  // controllers: [AppController],
   providers: [
     AppService,
     ExpensesService,
