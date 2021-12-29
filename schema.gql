@@ -2,53 +2,102 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type User {
+  _id: String!
+  login: String!
+  password: String!
+  email: String!
+  createdAt: String!
+  roles: Roles
+}
+
+"""Roles for Admin creating projects and users"""
+enum Roles {
+  Admin
+  Basic
+}
+
+type Categories {
+  _id: String!
+  userId: String!
+  childOf: String
+  name: String!
+}
+
 type Expense {
-  category: Float!
+  category: String!
   price: Float!
 }
 
 type Expenses {
-  _id: ID!
-  date: DateTime!
+  _id: String!
+  year: Float!
+  month: Float!
+  day: Float!
+  week: Float!
   expenses: [Expense!]!
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type User {
-  _id: ID!
-  login: String!
-  email: String!
-  password: String!
-  expenses: Expenses!
+type ExpensesWithCategories {
+  expenses: [Expenses!]!
+  categories: [Categories!]!
 }
 
 type Query {
-  expenses: [Expenses!]!
-  users: [User!]!
+  getHello: String!
+  findAllUsers: [User!]!
+  findOne(_id: String!): User!
+  CurrentUser: User!
+  getDayExpense(userId: String!, day: Float!, month: Float!, year: Float!): Expenses!
+  monthExpenses(userId: String!, month: Float!, year: Float!): [Expenses!]!
+  getExpenses(userId: String!, month: Float!, year: Float!): ExpensesWithCategories!
+  getCategories(userId: String!): [Categories!]!
 }
 
 type Mutation {
-  createExpenses(input: CreateExpensesInput!): Expenses!
-  updateExpenses(input: UpdateExpensesInput!): Expenses!
+  createUser(createUserInput: CreateUserInput!): User!
+  login(password: String!, email: String!): String!
+  UpdateUserInput(updateUserInput: UpdateUserInput!): User!
+  UpdateUserPass(newPass: String!, currPass: String!): User!
+  removeUser(_id: String!): User!
+  createExpenses(createExpensesInput: CreateExpensesInput!): Expenses!
+  updateExpenses(updateExpenseInput: UpdateExpensesInput!, _id: String!): Expenses!
+  createCategory(createCategoryInput: CreateCategoryInput!): Categories!
+  removeCategory(_id: String!): [Categories!]!
+}
+
+input CreateUserInput {
+  logn: String!
+  email: String!
+  password: String!
+  createdAt: String = "2021-12-29T19:53:57.733Z"
+}
+
+input UpdateUserInput {
+  logn: String
+  email: String
 }
 
 input CreateExpensesInput {
-  _id: ID!
-  date: DateTime!
+  userId: String!
+  year: Float!
+  month: Float!
+  day: Float!
+  week: Float!
   expenses: [ExpenseInput!]!
 }
 
 input ExpenseInput {
-  category: Float!
+  category: String!
   price: Float!
 }
 
 input UpdateExpensesInput {
-  _id: ID!
-  date: DateTime!
-  expenses: [ExpenseInput!]!
+  userId: String
+  expenses: [ExpenseInput!]
+}
+
+input CreateCategoryInput {
+  name: String!
+  childOf: String
 }

@@ -1,7 +1,7 @@
 import { Args, Query, Mutation, Resolver, ID } from '@nestjs/graphql';
 import { Types } from 'mongoose';
 import { CreateExpensesInput, UpdateExpensesInput } from './expenses-input.dto';
-import { Expenses } from './expenses.entity';
+import { Expenses, ExpensesWithCategories } from './expenses.entity';
 import { ExpensesService } from './expenses.service';
 
 @Resolver()
@@ -44,6 +44,22 @@ export class ExpensesResolver {
       }
     }
 
+    @Query(() => ExpensesWithCategories)
+    async getExpenses(
+        @Args('year', { type: () => Number }) year: number,
+        @Args('month', { type: () => Number }) month: number,
+        @Args('userId', { type: () => String }) userId: string,
+        ) {
+      try {
+        return await this.expensesService.getExpenses(
+            userId,
+            year,
+            month,
+            );
+      } catch (err) {
+        console.error(err);
+      }
+    }
     
     @Mutation(() => Expenses)
     async createExpenses(@Args('createExpensesInput') createExpensesInput: CreateExpensesInput) {

@@ -11,6 +11,22 @@ export class ExpensesService {
     @InjectModel(Expenses.name) private ExpensesModel: Model<ExpensesDocument>,
     private readonly categoriesService: CategoriesService
   ) {}
+
+  
+  async getExpenses(userId: string, year: number, month: number) {
+    try {
+      const categories = await this.categoriesService.find(userId);
+      const expenses = await this.ExpensesModel.find({
+        userId,
+        year,
+        month,
+      }).exec();
+      return {categories, expenses};
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   async getDayExpense(
     userId: string,
     year: number,
