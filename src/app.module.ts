@@ -1,36 +1,27 @@
-// src/app.module.ts
 import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { AppController } from './app.controller';
+import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
-import { UserService } from './user/user.service';
-import { UserResolver } from './user/user.resolver';
+import { MongooseModule } from '@nestjs/mongoose';
+import { GraphQLModule } from '@nestjs/graphql';
 import { UserModule } from './user/user.module';
-import { userProviders } from './user/user.providers';
-import { databaseProviders } from './database/database.providers';
-import { DatabaseModule } from './database/database.module';
 import { ExpensesModule } from './expenses/expenses.module';
-import { ExpensesService } from './expenses/expenses.service';
-import { ExpensesResolver } from './expenses/expenses.resolver';
-import { expensesProviders } from './expenses/expenses.providers';
+import { CategoriesService } from './categories/categories.service';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
+    MongooseModule.forRoot(
+      'mongodb+srv://midze:kapa1989@cluster0.wvxan.mongodb.net/budget?retryWrites=true&w=majority',
+    ),
     GraphQLModule.forRoot({
-      autoSchemaFile: 'schema.gql',
+      autoSchemaFile: true,
+      playground: true,
+      debug: false,
     }),
     UserModule,
     ExpensesModule,
-    DatabaseModule,
+    CategoriesModule,
   ],
-  // controllers: [AppController],
-  providers: [
-    AppService,
-    ExpensesService,
-    ExpensesResolver,
-    ...databaseProviders,
-    ...userProviders,
-    ...expensesProviders,
-  ],
+  providers: [AppService, AppResolver],
 })
 export class AppModule {}

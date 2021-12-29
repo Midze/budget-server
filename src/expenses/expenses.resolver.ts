@@ -1,25 +1,68 @@
-// src/user/user.resolver.ts
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
-import { CreateExpensesInput, UpdateExpensesInput } from './expenses.input';
+import { Args, Query, Mutation, Resolver, ID } from '@nestjs/graphql';
+import { Types } from 'mongoose';
+import { CreateExpensesInput, UpdateExpensesInput } from './expenses-input.dto';
+import { Expenses } from './expenses.entity';
 import { ExpensesService } from './expenses.service';
-import { Expenses } from './expenses.schema';
 
-@Resolver(() => Expenses)
+@Resolver()
 export class ExpensesResolver {
-  constructor(private expensesService: ExpensesService) {}
+    constructor(private readonly expensesService: ExpensesService) {}
 
-  @Mutation(() => Expenses)
-  async createExpenses(@Args('input') input: CreateExpensesInput) {
-    return this.expensesService.create(input);
-  }
+    @Query(() => Expenses)
+    async getDayExpense(
+        @Args('year', { type: () => Number }) year: number,
+        @Args('month', { type: () => Number }) month: number,
+        @Args('day', { type: () => Number }) day: number,
+        @Args('userId', { type: () => String }) userId: string,
+        ) {
+      try {
+        return await this.expensesService.getDayExpense(
+            userId,
+            year,
+            month,
+            day,
+            );
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
-  @Mutation(() => Expenses)
-  async updateExpenses(@Args('input') input: UpdateExpensesInput) {
-    return await this.expensesService.update(input);
-  }
+    @Query(() => [Expenses])
+    async monthExpenses(
+        @Args('year', { type: () => Number }) year: number,
+        @Args('month', { type: () => Number }) month: number,
+        @Args('userId', { type: () => String }) userId: string,
+        ) {
+      try {
+        return await this.expensesService.getMonthExpense(
+            userId,
+            year,
+            month,
+            );
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
-  @Query(() => [Expenses])
-  async expenses() {
-    return this.expensesService.find();
-  }
+    
+    @Mutation(() => Expenses)
+    async createExpenses(@Args('createExpensesInput') createExpensesInput: CreateExpensesInput) {
+      try {
+        return await this.expensesService.createExpenses(createExpensesInput);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    @Mutation(() => Expenses)
+    async updateExpenses(
+      @Args('_id',{ type: () => String }) _id: Types.ObjectId,
+      @Args('updateExpenseInput') updateExpenseInput: UpdateExpensesInput,
+    ) {
+      try {
+        return await this.expensesService.updateExpenses(_id, updateExpenseInput);
+      } catch (err) {
+        console.error(err);
+      }
+    }
 }

@@ -1,12 +1,19 @@
-// src/user/user.module.ts
 import { Module } from '@nestjs/common';
-import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
-import { DatabaseModule } from '../database/database.module';
-import { userProviders } from './user.providers';
+import { UserResolver } from './user.resolver';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from './user.entity';
+import { JwtStrategy } from './jwt.strategy';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [DatabaseModule],
-  providers: [UserResolver, UserService, ...userProviders],
+  imports: [
+    JwtModule.register({
+      secret: 'hard!to-guess_secret',
+      signOptions: { expiresIn: '24h' },
+    }),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+  ],
+  providers: [UserResolver, UserService, JwtStrategy],
 })
 export class UserModule {}

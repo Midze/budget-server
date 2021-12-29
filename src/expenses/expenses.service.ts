@@ -1,27 +1,69 @@
-import { Model, FilterQuery, CreateQuery, UpdateQuery } from 'mongoose';
-import { Injectable, Inject } from '@nestjs/common';
-import { Expenses } from './expenses.schema';
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { CategoriesService } from 'src/categories/categories.service';
+import { UpdateExpensesInput, CreateExpensesInput } from './expenses-input.dto';
+import { Expenses, ExpensesDocument } from './expenses.entity';
 
 @Injectable()
 export class ExpensesService {
   constructor(
-    @Inject('EXPENSES_MODEL')
-    private expensesModel: Model<Expenses>,
+    @InjectModel(Expenses.name) private ExpensesModel: Model<ExpensesDocument>,
+    private readonly categoriesService: CategoriesService
   ) {}
-
-  async create(input: CreateQuery<Expenses>): Promise<Expenses> {
-    return this.expensesModel.create(input);
+  async getDayExpense(
+    userId: string,
+    year: number,
+    month: number,
+    day: number,
+  ) {
+    try {
+      return await this.ExpensesModel.findOne({
+        userId,
+        year,
+        month,
+        day,
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  async update(input: UpdateQuery<Expenses>): Promise<Expenses> {
-    return this.expensesModel.findByIdAndUpdate(input._id, input, {new: true});
+  async getMonthExpense(userId: string, year: number, month: number) {
+    try {
+      return await this.ExpensesModel.find({
+        userId,
+        year,
+        month,
+      }).exec();
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  async findOne(query: FilterQuery<Expenses>): Promise<Expenses> {
-    return this.expensesModel.findOne(query).lean();
+  async updateExpenses(
+    _id: Types.ObjectId,
+    updateExpenseInput: UpdateExpensesInput,
+  ) {
+    try {
+      return await this.ExpensesModel.findByIdAndUpdate(
+        _id,
+        updateExpenseInput,
+        {
+          new: true,
+        },
+      ).exec();
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  async find(): Promise<Expenses[]> {
-    return this.expensesModel.find().lean();
+  async createExpenses(createExpensesInput: CreateExpensesInput) {
+    try {
+        return await new this.ExpensesModel(createExpensesInput).save();
+      }
+    catch (err) {
+      console.error(err);
+    }
   }
 }
