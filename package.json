@@ -1,5 +1,5 @@
 {
-  "name": "auth-fastify-nest",
+  "name": "nestjs-graphql-budget-app",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -47,7 +47,6 @@
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
-    "apollo-server-fastify": "^3.0.0-alpha.3",
     "eslint": "^7.12.1",
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-prettier": "^3.1.4",
