@@ -46,6 +46,8 @@ export class ExpensesResolver {
 
     @Query(() => ExpensesWithCategories)
     async getExpenses(
+        @Args('day', { type: () => Number }) day: number,
+        @Args('week', { type: () => Number }) week: number,
         @Args('year', { type: () => Number }) year: number,
         @Args('month', { type: () => Number }) month: number,
         @Args('userId', { type: () => String }) userId: string,
@@ -53,6 +55,8 @@ export class ExpensesResolver {
       try {
         return await this.expensesService.getExpenses(
             userId,
+            day,
+            week,
             year,
             month,
             );

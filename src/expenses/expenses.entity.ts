@@ -44,10 +44,30 @@ export class Expenses {
 
 @ObjectType()
 @Schema()
+export class ExpensesByPeriod {
+    @Field()
+    @Prop()
+    total: number;
+
+    @Field(() => [Expense])
+    @Prop()
+    expenses?: Expense[]
+}
+
+@ObjectType()
+@Schema()
 export class ExpensesWithCategories {
-    @Field(() => [Expenses])
-    @Prop({nullable: true})
-    expenses?: Expenses[];
+    @Field()
+    @Prop()
+    day: ExpensesByPeriod;
+
+    @Field()
+    @Prop()
+    week: ExpensesByPeriod;
+
+    @Field()
+    @Prop()
+    month: ExpensesByPeriod;
 
     @Field(() => [Categories])
     @Prop({nullable: true})
