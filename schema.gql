@@ -57,7 +57,7 @@ type Query {
   CurrentUser: User!
   getDayExpense(userId: String!, day: Float!, month: Float!, year: Float!): Expenses!
   monthExpenses(userId: String!, month: Float!, year: Float!): [Expenses!]!
-  getExpenses(userId: String!, month: Float!, year: Float!, week: Float!, day: Float!): ExpensesWithCategories!
+  getMothExpenses(userId: String!, month: Float!, year: Float!, week: Float!, day: Float!): ExpensesWithCategories!
   getCategories(userId: String!): [Categories!]!
 }
 
@@ -77,7 +77,7 @@ input CreateUserInput {
   logn: String!
   email: String!
   password: String!
-  createdAt: String = "2021-12-31T15:38:55.866Z"
+  createdAt: String = "2021-12-31T15:50:57.968Z"
 }
 
 input UpdateUserInput {

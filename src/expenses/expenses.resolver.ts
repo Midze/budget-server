@@ -45,7 +45,7 @@ export class ExpensesResolver {
     }
 
     @Query(() => ExpensesWithCategories)
-    async getExpenses(
+    async getMothExpenses(
         @Args('day', { type: () => Number }) day: number,
         @Args('week', { type: () => Number }) week: number,
         @Args('year', { type: () => Number }) year: number,
@@ -53,7 +53,7 @@ export class ExpensesResolver {
         @Args('userId', { type: () => String }) userId: string,
         ) {
       try {
-        return await this.expensesService.getExpenses(
+        return await this.expensesService.getMothExpenses(
             userId,
             day,
             week,

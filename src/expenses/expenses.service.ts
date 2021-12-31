@@ -13,7 +13,7 @@ export class ExpensesService {
   ) {}
 
   
-  async getExpenses(userId: string, day: number, week: number, year: number, month: number) {
+  async getMothExpenses(userId: string, day: number, week: number, year: number, month: number) {
     try {
       const dayExpenses: ExpensesByPeriod = {
         total: 0,
