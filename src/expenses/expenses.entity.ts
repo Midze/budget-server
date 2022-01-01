@@ -21,6 +21,10 @@ export class Expenses {
     @Field(() => String)
     _id: Types.ObjectId;
 
+    @Field(() => String)
+    @Prop()
+    userId: string;
+
     @Field(() => Number)
     @Prop()
     year: number;
@@ -56,10 +60,17 @@ export class ExpensesByPeriod {
 
 @ObjectType()
 @Schema()
-export class ExpensesWithCategories {
+export class ExpensesForDay extends ExpensesByPeriod {
+    @Field(() => String, {nullable: true})
+    _id: Types.ObjectId
+}
+
+@ObjectType()
+@Schema()
+export class ExpensesForMonth {
     @Field()
     @Prop()
-    day: ExpensesByPeriod;
+    day: ExpensesForDay;
 
     @Field()
     @Prop()
@@ -68,7 +79,10 @@ export class ExpensesWithCategories {
     @Field()
     @Prop()
     month: ExpensesByPeriod;
-
+}
+@ObjectType()
+@Schema()
+export class ExpensesWithCategories extends ExpensesForMonth {
     @Field(() => [Categories])
     @Prop({nullable: true})
     categories?: Categories[];

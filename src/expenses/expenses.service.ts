@@ -13,7 +13,7 @@ export class ExpensesService {
   ) {}
 
   
-  async getMothExpenses(userId: string, day: number, week: number, year: number, month: number) {
+  async getMonthExpenses(userId: string, day: number, week: number, year: number, month: number) {
     try {
       const dayExpenses: ExpensesByPeriod = {
         total: 0,
@@ -27,6 +27,7 @@ export class ExpensesService {
         total: 0,
         expenses: []
       };
+      let currentDayExpensesId: string | null;
       const categories = await this.categoriesService.find(userId);
       const expenses = await this.ExpensesModel.find({
         userId,
@@ -38,6 +39,7 @@ export class ExpensesService {
         const expenses = expense.expenses;
         // to-do create function for data splitting
         if (expense.day === day) {
+          currentDayExpensesId = expense._id;
           dayExpenses.expenses = expenses;
           dayExpenses.total = expenses.reduce(function(total = 0, expense) {
             return total + expense.price;
@@ -60,41 +62,14 @@ export class ExpensesService {
       });
 
       return {
-        day: dayExpenses,
+        day: {
+          ...dayExpenses,
+          _id: currentDayExpensesId,
+        },
         week: weekExpenses,
         month: monthExpenses,
         categories,
       };
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async getDayExpense(
-    userId: string,
-    year: number,
-    month: number,
-    day: number,
-  ) {
-    try {
-      return await this.ExpensesModel.findOne({
-        userId,
-        year,
-        month,
-        day,
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async getMonthExpense(userId: string, year: number, month: number) {
-    try {
-      return await this.ExpensesModel.find({
-        userId,
-        year,
-        month,
-      }).exec();
     } catch (err) {
       console.error(err);
     }
@@ -105,13 +80,11 @@ export class ExpensesService {
     updateExpenseInput: UpdateExpensesInput,
   ) {
     try {
-      return await this.ExpensesModel.findByIdAndUpdate(
+      const {userId, day, week, year, month} = await this.ExpensesModel.findByIdAndUpdate(
         _id,
-        updateExpenseInput,
-        {
-          new: true,
-        },
-      ).exec();
+        updateExpenseInput
+      );
+      return await this.getMonthExpenses(userId, day, week, year, month);
     } catch (err) {
       console.error(err);
     }
@@ -119,10 +92,41 @@ export class ExpensesService {
 
   async createExpenses(createExpensesInput: CreateExpensesInput) {
     try {
-        return await new this.ExpensesModel(createExpensesInput).save();
-      }
+      const {userId, day, week, year, month} = await new this.ExpensesModel(createExpensesInput).save();
+      return await this.getMonthExpenses(userId, day, week, year, month);
+    }
     catch (err) {
       console.error(err);
     }
   }
+
+  // async getDayExpense(
+  //   userId: string,
+  //   year: number,
+  //   month: number,
+  //   day: number,
+  // ) {
+  //   try {
+  //     return await this.ExpensesModel.findOne({
+  //       userId,
+  //       year,
+  //       month,
+  //       day,
+  //     });
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // }
+
+  // async getMonthExpense(userId: string, year: number, month: number) {
+  //   try {
+  //     return await this.ExpensesModel.find({
+  //       userId,
+  //       year,
+  //       month,
+  //     }).exec();
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // }
 }
