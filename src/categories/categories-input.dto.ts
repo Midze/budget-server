@@ -4,15 +4,11 @@ import { Types } from 'mongoose';
 @InputType()
 export class CreateCategoryInput {
   @Field()
+  userId: string;
+
+  @Field()
   name: string;
 
   @Field(() => String, {nullable: true})
-  childOf?: string;
+  childOf: string | null;
 }
-
-// @InputType()
-// export class CreateCategoryInput {
-//   @Field(() => [CreateCategory])
-//   categories: CreateCategory[];
-
-// }
