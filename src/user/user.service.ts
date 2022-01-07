@@ -20,7 +20,7 @@ export class UserService {
         email: createUserInput.email,
       });
       if (isUser) {
-        throw new GraphQLError('Nah bro you already exist');
+        return new GraphQLError('Nah bro you already exist');
       } else {
         createUserInput.password = await bcrypt
           .hash(createUserInput.password, 10)
@@ -36,7 +36,10 @@ export class UserService {
     try {
       const user = await this.UserModel.findOne({ email });
       return user && (await bcrypt.compare(password, user.password))
-        ? await this.jwtService.signAsync({ email, _id: user._id })
+        ? {
+          token: await this.jwtService.signAsync({ email, _id: user._id }),
+          user,
+        }
         : new GraphQLError('Nah homie, wrong password/email');
     } catch (err) {
       console.error(err);

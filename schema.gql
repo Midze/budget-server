@@ -17,6 +17,11 @@ enum Roles {
   Basic
 }
 
+type LoginUser {
+  user: User!
+  token: String!
+}
+
 type Categories {
   _id: String!
   userId: String!
@@ -64,7 +69,7 @@ type Query {
 
 type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
-  login(password: String!, email: String!): String!
+  login(password: String!, email: String!): LoginUser!
   UpdateUserInput(updateUserInput: UpdateUserInput!): User!
   UpdateUserPass(newPass: String!, currPass: String!): User!
   removeUser(_id: String!): User!
@@ -75,14 +80,13 @@ type Mutation {
 }
 
 input CreateUserInput {
-  logn: String!
+  login: String!
   email: String!
   password: String!
-  createdAt: String = "2022-01-03T02:00:47.843Z"
 }
 
 input UpdateUserInput {
-  logn: String
+  login: String
   email: String
 }
 

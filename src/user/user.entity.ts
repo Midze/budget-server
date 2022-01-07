@@ -39,5 +39,17 @@ export class User {
   roles?: string;
 }
 
+@ObjectType()
+@Schema()
+export class LoginUser {
+  @Field(() => User)
+  @Prop()
+  user: User
+
+  @Field(() => String)
+  @Prop()
+  token: string;
+}
+
 export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);

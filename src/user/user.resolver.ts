@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { User } from './user.entity';
+import { LoginUser, User } from './user.entity';
 import { CreateUserInput, UpdateUserInput } from './user-inputs.dto';
 import { UserService } from './user.service';
 import { UseGuards } from '@nestjs/common';
@@ -20,7 +20,7 @@ export class UserResolver {
     }
   }
 
-  @Mutation(() => String)
+  @Mutation(() => LoginUser)
   async login(
     @Args('email') email: string,
     @Args('password') password: string,

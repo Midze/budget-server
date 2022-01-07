@@ -23,7 +23,7 @@ export class CategoriesService {
   async createCategory(createCategoryInput: CreateCategoryInput) {
     try {
       const { name, userId } = createCategoryInput;
-      const category = await this.CategoriesModel.findOne({ $or: [ {name, userId}, {name, userId: 'default'} ] });
+      const category = await this.CategoriesModel.findOne({ $or: [ {name, userId: 'default'}, {name, userId} ] });
       return category ? new GraphQLError(`Category with this name: '${name}' already exist`)
       : await new this.CategoriesModel(createCategoryInput).save();
     } catch (err) {
