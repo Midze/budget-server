@@ -62,7 +62,7 @@ type Query {
   getHello: String!
   findAllUsers: [User!]!
   findOne(_id: String!): User!
-  CurrentUser: User!
+  getCurrentUser(id: String!): User!
   getMonthExpenses(userId: String!, month: Float!, year: Float!, week: Float!, day: Float!): ExpensesWithCategories!
   getCategories(userId: String!): [Categories!]!
 }

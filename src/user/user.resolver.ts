@@ -86,10 +86,9 @@ export class UserResolver {
   }
 
   @Query(() => User)
-  @UseGuards(GqlAuthGuard)
-  async CurrentUser(@CurrentUser() user: User) {
+  async getCurrentUser(@Args('id', { type: () => String }) id: Types.ObjectId) {
     try {
-      return await this.us.findOne(user._id);
+      return await this.us.findCurrentUser(id);
     } catch (err) {
       console.error(err);
     }

@@ -14,6 +14,14 @@ export class UserService {
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
   ) {}
 
+  async findCurrentUser(id: Types.ObjectId) {
+    try {
+      return await this.UserModel.findById(id);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   async createUser(createUserInput: CreateUserInput) {
     try {
       const isUser = await this.UserModel.findOne({
