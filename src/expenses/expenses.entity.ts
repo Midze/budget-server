@@ -10,9 +10,9 @@ export class Expense {
     @Prop()
     category: string;
 
-    @Field(() => Number)
+    @Field(() => String)
     @Prop()
-    price: number;
+    price: string;
 }
 
 @ObjectType()

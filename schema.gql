@@ -31,7 +31,7 @@ type Categories {
 
 type Expense {
   category: String!
-  price: Float!
+  price: String!
 }
 
 type ExpensesByPeriod {
@@ -101,7 +101,7 @@ input CreateExpensesInput {
 
 input ExpenseInput {
   category: String!
-  price: Float!
+  price: String!
 }
 
 input UpdateExpensesInput {

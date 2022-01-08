@@ -42,20 +42,20 @@ export class ExpensesService {
           currentDayExpensesId = expense._id;
           dayExpenses.expenses = expenses;
           dayExpenses.total = expenses.reduce(function(total = 0, expense) {
-            return total + expense.price;
+            return total + Number(expense.price);
           }, 0);
         }
 
         if (expense.week === week) {
           weekExpenses.expenses.push(...expenses);
           weekExpenses.total += expenses.reduce(function(total = 0, expense) {
-            return total + expense.price;
+            return total + Number(expense.price);
           }, 0);
         }
         if (expense.month === month) {
           monthExpenses.expenses.push(...expenses);
           monthExpenses.total += expenses.reduce(function(total = 0, expense) {
-            return total + expense.price;
+            return total + Number(expense.price);
           }, 0);
         }
 

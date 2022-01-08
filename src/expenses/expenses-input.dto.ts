@@ -7,7 +7,7 @@ export class ExpenseInput {
   category: string;
 
   @Field()
-  price: number;
+  price: string;
 }
 
 @InputType()
