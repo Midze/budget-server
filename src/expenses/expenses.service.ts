@@ -90,6 +90,36 @@ export class ExpensesService {
     }
   }
 
+  async moveExpensesToUncategorized(ids: [string], userId: string) {
+    try {
+      const { ok, n, nModified } = await this.ExpensesModel.updateMany({
+        "userId": userId
+      },
+      {
+        $set: {
+          "expenses.$[elem].category": "61eafc104b88e154caa58616"
+        }
+      },
+      {
+        arrayFilters: [
+          {
+            "elem.category": {
+              $in: ids
+            }
+          }
+        ]
+      });
+      
+      return {
+        ok,
+        n,
+        nModified
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   async createExpenses(createExpensesInput: CreateExpensesInput) {
     try {
       const {userId, day, week, year, month} = await new this.ExpensesModel(createExpensesInput).save();

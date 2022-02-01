@@ -80,6 +80,22 @@ export class ExpensesForMonth {
     @Prop()
     month: ExpensesByPeriod;
 }
+
+@ObjectType()
+@Schema()
+export class RemoveExpensesCategory {
+    @Field()
+    @Prop()
+    ok: boolean;
+
+    @Field()
+    @Prop()
+    n: number;
+
+    @Field()
+    @Prop()
+    nModified: number;
+}
 @ObjectType()
 @Schema()
 export class ExpensesWithCategories extends ExpensesForMonth {

@@ -6,11 +6,13 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { UserModule } from './user/user.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({}), 
     MongooseModule.forRoot(
-      'mongodb+srv://midze:kapa1989@cluster0.wvxan.mongodb.net/budget?retryWrites=true&w=majority',
+      `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.wvxan.mongodb.net/budget?retryWrites=true&w=majority`,
     ),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',

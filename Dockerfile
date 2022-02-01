@@ -1,7 +1,8 @@
 # You can use any Node version you like, see the full list of available versions:
 # https://hub.docker.com/_/node
 FROM node:14-alpine
-
+ENV DB_PASS=$DB_PASS
+ENV DB_USER=$DB_USER
 ADD package.json /tmp/package.json
 
 RUN rm -rf dist

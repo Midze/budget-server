@@ -12,3 +12,4 @@ export class CreateCategoryInput {
   @Field(() => String, {nullable: true})
   childOf: string | null;
 }
+

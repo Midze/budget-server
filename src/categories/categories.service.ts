@@ -8,13 +8,16 @@ import { Categories, CategoriesDocument } from './categories.entity';
 @Injectable()
 export class CategoriesService {
   constructor(
-    @InjectModel(Categories.name) private CategoriesModel: Model<CategoriesDocument>
-  ) {}
+    @InjectModel(Categories.name) private CategoriesModel: Model<CategoriesDocument>,
 
-  async removeCategory(_id: Types.ObjectId) {
+    ) {}
+
+  async removeCategory(ids: [string], userId: string) {
     try {
-      await this.CategoriesModel.findByIdAndRemove(_id);
-      return await this.CategoriesModel.find();
+      const { ok } = await this.CategoriesModel.deleteMany({_id: ids });
+      return ok ? await this.CategoriesModel.find({
+        userId: {$in: [userId, "default"]}
+      }) : new GraphQLError(`Error occurred while deleting category`);
     } catch (err) {
       console.error(err);
     }

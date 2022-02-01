@@ -10,6 +10,6 @@ import { ExpensesService } from './expenses.service';
     MongooseModule.forFeature([{ name: Expenses.name, schema: ExpensesSchema }]),
     CategoriesModule,
   ],
-  providers: [ExpensesResolver, ExpensesService]
+  providers: [ExpensesResolver, ExpensesService],
 })
 export class ExpensesModule {}
