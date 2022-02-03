@@ -1,6 +1,6 @@
 A GraphQL API built on top of NestJS and containerized by Docker.
 
-The application was built for the [Budget App](http://18.224.135.209:5000/).
+The application was built for the [Budget App](http://95.217.18.50:5000/).
 
 ### Getting started
 Start the application
