@@ -32,6 +32,14 @@ export class CreateExpensesInput {
 }
 
 @InputType()
+export class RemoveExpensesCategoryInput extends OmitType(CreateExpensesInput, ['expenses']) {
+  @Field()
+  userId: string;
+  @Field(() => [String])
+  ids: [string];
+}
+
+@InputType()
 export class UpdateExpensesInput extends PartialType(
   OmitType(CreateExpensesInput, ['year', 'month', 'day', 'week'] as const),
 ) {}

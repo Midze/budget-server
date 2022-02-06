@@ -75,7 +75,7 @@ type Mutation {
   removeUser(_id: String!): User!
   createExpenses(createExpensesInput: CreateExpensesInput!): ExpensesForMonth!
   updateExpenses(updateExpenseInput: UpdateExpensesInput!, _id: String!): ExpensesForMonth!
-  removeExpensesCategory(month: Float!, year: Float!, week: Float!, day: Float!, userId: String!, ids: [String!]!): ExpensesWithCategories!
+  removeExpensesCategory(removeExpensesCategoryInput: RemoveExpensesCategoryInput!): ExpensesWithCategories!
   createCategory(createCategoryInput: CreateCategoryInput!): Categories!
   removeCategory(userId: String!, ids: [String!]!): [Categories!]!
 }
@@ -108,6 +108,15 @@ input ExpenseInput {
 input UpdateExpensesInput {
   userId: String
   expenses: [ExpenseInput!]
+}
+
+input RemoveExpensesCategoryInput {
+  userId: String!
+  year: Float!
+  month: Float!
+  day: Float!
+  week: Float!
+  ids: [String!]!
 }
 
 input CreateCategoryInput {

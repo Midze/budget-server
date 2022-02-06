@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { GraphQLError } from 'graphql';
 import { Model, Types } from 'mongoose';
 import { CategoriesService } from 'src/categories/categories.service';
-import { UpdateExpensesInput, CreateExpensesInput } from './expenses-input.dto';
+import { UpdateExpensesInput, CreateExpensesInput, RemoveExpensesCategoryInput } from './expenses-input.dto';
 import { Expenses, ExpensesByPeriod, ExpensesDocument } from './expenses.entity';
 
 @Injectable()
@@ -91,11 +91,12 @@ export class ExpensesService {
     }
   }
 
-  async moveExpensesToUncategorized(ids: [string], userId: string, day: number, week: number, year: number, month: number) {
+  async moveExpensesToUncategorized(removeExpensesCategoryInput: RemoveExpensesCategoryInput) {
     try {
+      const { ids, userId, day, month, week, year } = removeExpensesCategoryInput;
       const categories = await this.categoriesService.removeCategory(ids, userId);
       const { ok, n, nModified } = await this.ExpensesModel.updateMany({
-        "userId": userId
+        "userId": userId 
       },
       {
         $set: {

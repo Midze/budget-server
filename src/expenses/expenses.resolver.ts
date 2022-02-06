@@ -1,7 +1,7 @@
 import { Args, Query, Mutation, Resolver, ID } from '@nestjs/graphql';
 import { Types } from 'mongoose';
 import { UseGuards } from '@nestjs/common';
-import { CreateExpensesInput, UpdateExpensesInput } from './expenses-input.dto';
+import { CreateExpensesInput, UpdateExpensesInput, RemoveExpensesCategoryInput } from './expenses-input.dto';
 import { Expenses, ExpensesForMonth, ExpensesWithCategories } from './expenses.entity';
 import { ExpensesService } from './expenses.service';
 import { GqlExpensesGuard } from './expenses.guard';
@@ -96,22 +96,10 @@ export class ExpensesResolver {
     @Mutation(() => ExpensesWithCategories)
     @UseGuards(GqlExpensesGuard)
     async removeExpensesCategory(
-      @Args('ids',{ type: () => [String] }) ids: [string],
-      @Args('userId', { type: () => String }) userId: string,
-      @Args('day', { type: () => Number }) day: number,
-      @Args('week', { type: () => Number }) week: number,
-      @Args('year', { type: () => Number }) year: number,
-      @Args('month', { type: () => Number }) month: number,
+      @Args('removeExpensesCategoryInput') removeExpensesCategoryInput: RemoveExpensesCategoryInput,
     ) {
       try {
-        return await this.expensesService.moveExpensesToUncategorized(
-          ids,
-          userId,
-          day,
-          week,
-          year,
-          month
-        );
+        return await this.expensesService.moveExpensesToUncategorized(removeExpensesCategoryInput);
       } catch (err) {
         console.error(err);
       }
