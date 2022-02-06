@@ -93,8 +93,8 @@ export class ExpensesService {
 
   async moveExpensesToUncategorized(removeExpensesCategoryInput: RemoveExpensesCategoryInput) {
     try {
-      const { id, userId, day, month, week, year } = removeExpensesCategoryInput;
-      const categories = await this.categoriesService.removeCategory(id, userId);
+      const { ids, userId, day, month, week, year } = removeExpensesCategoryInput;
+      const categories = await this.categoriesService.removeCategory(ids, userId);
       const { ok, n, nModified } = await this.ExpensesModel.updateMany({
         "userId": userId 
       },
@@ -106,7 +106,9 @@ export class ExpensesService {
       {
         arrayFilters: [
           {
-            "elem.category": {id}
+            "elem.category": {
+              $in: ids
+            }
           }
         ]
       });
