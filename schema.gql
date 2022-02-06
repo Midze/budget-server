@@ -51,12 +51,6 @@ type ExpensesForMonth {
   month: ExpensesByPeriod!
 }
 
-type RemoveExpensesCategory {
-  ok: Boolean!
-  n: Float!
-  nModified: Float!
-}
-
 type ExpensesWithCategories {
   day: ExpensesForDay!
   week: ExpensesByPeriod!
@@ -81,7 +75,7 @@ type Mutation {
   removeUser(_id: String!): User!
   createExpenses(createExpensesInput: CreateExpensesInput!): ExpensesForMonth!
   updateExpenses(updateExpenseInput: UpdateExpensesInput!, _id: String!): ExpensesForMonth!
-  removeExpensesCategory(userId: String!, ids: [String!]!): RemoveExpensesCategory!
+  removeExpensesCategory(month: Float!, year: Float!, week: Float!, day: Float!, userId: String!, ids: [String!]!): ExpensesWithCategories!
   createCategory(createCategoryInput: CreateCategoryInput!): Categories!
   removeCategory(userId: String!, ids: [String!]!): [Categories!]!
 }

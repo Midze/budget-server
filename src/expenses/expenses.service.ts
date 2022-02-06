@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { GraphQLError } from 'graphql';
 import { Model, Types } from 'mongoose';
 import { CategoriesService } from 'src/categories/categories.service';
 import { UpdateExpensesInput, CreateExpensesInput } from './expenses-input.dto';
@@ -90,8 +91,9 @@ export class ExpensesService {
     }
   }
 
-  async moveExpensesToUncategorized(ids: [string], userId: string) {
+  async moveExpensesToUncategorized(ids: [string], userId: string, day: number, week: number, year: number, month: number) {
     try {
+      const categories = await this.categoriesService.removeCategory(ids, userId);
       const { ok, n, nModified } = await this.ExpensesModel.updateMany({
         "userId": userId
       },
@@ -109,11 +111,11 @@ export class ExpensesService {
           }
         ]
       });
-      
-      return {
-        ok,
-        n,
-        nModified
+      const res = await this.getMonthExpenses(userId, day, week, year, month);
+      if (ok && categories ) {
+        return res;
+      } else {
+        new GraphQLError(`Error occurred while deleting category`);
       }
     } catch (err) {
       console.error(err);
