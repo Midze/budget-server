@@ -37,11 +37,11 @@ export class CategoriesResolver {
     @Mutation(() => [Categories])
     @UseGuards(GqlCategoriesGuard)
     async removeCategory(
-        @Args('ids',{ type: () => [String] }) ids: [string],
+        @Args('id',{ type: () => String }) id: string,
         @Args('userId', { type: () => String }) userId: string,
     ) {
         try {
-            return await this.categoriesService.removeCategory(ids, userId);
+            return await this.categoriesService.removeCategory(id, userId);
         } catch (error) {
             console.error(error);
         }

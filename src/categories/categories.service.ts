@@ -12,9 +12,9 @@ export class CategoriesService {
 
     ) {}
 
-  async removeCategory(ids: [string], userId: string) {
+  async removeCategory(id: string, userId: string) {
     try {
-      const { ok } = await this.CategoriesModel.deleteMany({_id: ids });
+      const { ok } = await this.CategoriesModel.deleteMany({$or: [{_id: id}, {childOf: id}]});
       return ok ? await this.CategoriesModel.find({
         userId: {$in: [userId, "default"]}
       }) : new GraphQLError(`Error occurred while deleting category`);

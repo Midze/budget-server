@@ -35,8 +35,8 @@ export class CreateExpensesInput {
 export class RemoveExpensesCategoryInput extends OmitType(CreateExpensesInput, ['expenses']) {
   @Field()
   userId: string;
-  @Field(() => [String])
-  ids: [string];
+  @Field()
+  id: string;
 }
 
 @InputType()
