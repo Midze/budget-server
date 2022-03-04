@@ -34,6 +34,17 @@ type Expense {
   price: String!
 }
 
+type Expenses {
+  _id: String!
+  userId: String!
+  year: Float!
+  month: Float!
+  day: Float!
+  week: Float!
+  expenses: [Expense!]!
+  total: String!
+}
+
 type ExpensesByPeriod {
   total: Float!
   expenses: [Expense!]!
@@ -76,6 +87,7 @@ type Mutation {
   createExpenses(createExpensesInput: CreateExpensesInput!): ExpensesForMonth!
   updateExpenses(updateExpenseInput: UpdateExpensesInput!, _id: String!): ExpensesForMonth!
   removeExpensesCategory(removeExpensesCategoryInput: RemoveExpensesCategoryInput!): ExpensesWithCategories!
+  addExpensesTotat(_id: String!): Expenses!
   createCategory(createCategoryInput: CreateCategoryInput!): Categories!
   removeCategory(userId: String!, id: [String!]!): [Categories!]!
 }

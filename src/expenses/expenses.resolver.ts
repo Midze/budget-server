@@ -104,4 +104,15 @@ export class ExpensesResolver {
         console.error(err);
       }
     }
+  
+    @Mutation(() => Expenses)
+    async addExpensesTotat(
+      @Args('_id',{ type: () => String }) _id: Types.ObjectId,
+      ) {
+      try {
+        return await this.expensesService.addExpensesTotat(_id);
+      } catch (err) {
+        console.error(err);
+      }
+    }
 }

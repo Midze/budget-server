@@ -13,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({}), 
     MongooseModule.forRoot(
       `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.wvxan.mongodb.net/budget?retryWrites=true&w=majority`,
-    ),
+      ),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
     }),

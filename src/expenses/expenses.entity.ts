@@ -44,6 +44,10 @@ export class Expenses {
     @Field(() => [Expense])
     @Prop({nullable: true})
     expenses?: Expense[];
+
+    @Field(() => String)
+    @Prop()
+    total?: string;
 }
 
 @ObjectType()

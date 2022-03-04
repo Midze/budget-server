@@ -4,7 +4,7 @@ import { GraphQLError } from 'graphql';
 import { Model, Types } from 'mongoose';
 import { CategoriesService } from 'src/categories/categories.service';
 import { UpdateExpensesInput, CreateExpensesInput, RemoveExpensesCategoryInput } from './expenses-input.dto';
-import { Expenses, ExpensesByPeriod, ExpensesDocument } from './expenses.entity';
+import { Expense, Expenses, ExpensesByPeriod, ExpensesDocument } from './expenses.entity';
 
 @Injectable()
 export class ExpensesService {
@@ -13,7 +13,13 @@ export class ExpensesService {
     private readonly categoriesService: CategoriesService
   ) {}
 
-  
+  getDayTota(expenses:Expense[]): string {
+    const total = expenses.reduce(function(total = 0, expense) {
+      return total + Number(expense.price);
+    }, 0);
+    return total.toString();
+  }
+
   async getMonthExpenses(userId: string, day: number, week: number, year: number, month: number) {
     try {
       const dayExpenses: ExpensesByPeriod = {
@@ -81,9 +87,14 @@ export class ExpensesService {
     updateExpenseInput: UpdateExpensesInput,
   ) {
     try {
+      const { expenses } = updateExpenseInput;
+      const total = this.getDayTota(expenses);
       const {userId, day, week, year, month} = await this.ExpensesModel.findByIdAndUpdate(
         _id,
-        updateExpenseInput
+        {
+          ...updateExpenseInput,
+          total
+        }
       );
       return await this.getMonthExpenses(userId, day, week, year, month);
     } catch (err) {
@@ -125,8 +136,37 @@ export class ExpensesService {
 
   async createExpenses(createExpensesInput: CreateExpensesInput) {
     try {
-      const {userId, day, week, year, month} = await new this.ExpensesModel(createExpensesInput).save();
+      const { expenses } = createExpensesInput;
+      const total = this.getDayTota(expenses);
+      const {userId, day, week, year, month} = await new this.ExpensesModel({
+        ...createExpensesInput,
+        total
+      }).save();
       return await this.getMonthExpenses(userId, day, week, year, month);
+    }
+    catch (err) {
+      console.error(err);
+    }
+  }
+
+  async addExpensesTotat(_id: Types.ObjectId) {
+    try {
+      const {userId, day, week, year, month, expenses} = await this.ExpensesModel.findOne({_id});
+      let total = 0;
+      expenses.forEach(({price}) => {
+        total += Number(price);
+      })
+      const {ok, n, nModified} = await this.ExpensesModel.updateOne(
+        {_id},
+        {$set: {total: String(total)}}
+      )
+      return await this.ExpensesModel.findOne({
+        userId,
+        day,
+        week,
+        month,
+        year
+      });
     }
     catch (err) {
       console.error(err);
