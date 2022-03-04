@@ -47,7 +47,7 @@ export class ExpensesResolver {
     // }
 
     @Query(() => ExpensesWithCategories)
-    @UseGuards(GqlExpensesGuard)
+    // @UseGuards(GqlExpensesGuard)
     async getMonthExpenses(
         @Args('day', { type: () => Number }) day: number,
         @Args('week', { type: () => Number }) week: number,

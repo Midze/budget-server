@@ -44,6 +44,7 @@ export class ExpensesService {
 
       expenses.forEach((expense) => {
         const expenses = expense.expenses;
+        // this.addExpensesTotat(expense._id);
         // to-do create function for data splitting
         if (expense.day === day) {
           currentDayExpensesId = expense._id;
