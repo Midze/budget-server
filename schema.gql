@@ -62,8 +62,15 @@ type ExpensesForMonth {
   month: ExpensesByPeriod!
 }
 
+type MonthExpenses {
+  total: Float!
+  month: Float!
+  year: Float!
+  expenses: [Expense!]!
+}
+
 type ExpensesByMonth {
-  expensesByMonth: [ExpensesByPeriod!]!
+  expensesByMonth: [MonthExpenses!]!
   categories: [Categories!]!
 }
 

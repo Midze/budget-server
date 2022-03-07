@@ -93,19 +93,25 @@ export class ExpensesService {
     const expensesByMonth: {
       [key: string]: {
         total: number,
+        month: number,
+        year: number,
         expenses: Expense[]
       }
     } = {};
     expenses.forEach((expense) => {
       const expenses = expense.expenses;
       const month = expense.month;
-      const total = expense.total;
+      const year = expense.year;
+      const total = expense.total ? +expense.total : 0;
+      
       if (expensesByMonth[month]) {
-        expensesByMonth[month].total += +expense.total;
+        expensesByMonth[month].total += total;
         expensesByMonth[month].expenses.push(...expenses);
       } else {
         expensesByMonth[month] = {
-          total: total ? +total : 0,
+          total: total,
+          month,
+          year,
           expenses: expenses
         };
       }

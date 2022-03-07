@@ -53,7 +53,7 @@ export class Expenses {
 @ObjectType()
 @Schema()
 export class ExpensesByPeriod {
-    @Field()
+    @Field(() => Number)
     @Prop()
     total: number;
 
@@ -100,13 +100,31 @@ export class ExpensesForMonth {
 //     @Prop()
 //     nModified: number;
 // }
+@ObjectType()
+@Schema()
+export class MonthExpenses {
+    @Field(() => Number)
+    @Prop()
+    total: number;
 
+    @Field(() => Number)
+    @Prop({nullable: true})
+    month?: number;
+
+    @Field(() => Number)
+    @Prop({nullable: true})
+    year?: number;
+
+    @Field(() => [Expense])
+    @Prop()
+    expenses?: Expense[]
+}
 @ObjectType()
 @Schema()
 export class ExpensesByMonth {
-    @Field(() => [ExpensesByPeriod])
+    @Field(() => [MonthExpenses])
     @Prop()
-    expensesByMonth: ExpensesByPeriod[];
+    expensesByMonth: MonthExpenses[];
 
     @Field(() => [Categories])
     @Prop({nullable: true})
