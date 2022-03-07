@@ -83,6 +83,40 @@ export class ExpensesService {
     }
   }
 
+  async getByMonthExpenses(userId: string, months: number[], year: number) {
+    const categories = await this.categoriesService.find(userId);
+    const expenses = await this.ExpensesModel.find({
+      userId,
+      month: { $in: months },
+      year,
+    }).exec();
+    const expensesByMonth: {
+      [key: string]: {
+        total: number,
+        expenses: Expense[]
+      }
+    } = {};
+    expenses.forEach((expense) => {
+      const expenses = expense.expenses;
+      const month = expense.month;
+      const total = expense.total;
+      if (expensesByMonth[month]) {
+        expensesByMonth[month].total += +expense.total;
+        expensesByMonth[month].expenses.push(...expenses);
+      } else {
+        expensesByMonth[month] = {
+          total: total ? +total : 0,
+          expenses: expenses
+        };
+      }
+      
+    });
+    return {
+      categories,
+      expensesByMonth: Object.values(expensesByMonth)
+    };
+  }
+
   async updateExpenses(
     _id: Types.ObjectId,
     updateExpenseInput: UpdateExpensesInput,

@@ -100,6 +100,18 @@ export class ExpensesForMonth {
 //     @Prop()
 //     nModified: number;
 // }
+
+@ObjectType()
+@Schema()
+export class ExpensesByMonth {
+    @Field(() => [ExpensesByPeriod])
+    @Prop()
+    expensesByMonth: ExpensesByPeriod[];
+
+    @Field(() => [Categories])
+    @Prop({nullable: true})
+    categories?: Categories[];
+}
 @ObjectType()
 @Schema()
 export class ExpensesWithCategories extends ExpensesForMonth {
