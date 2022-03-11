@@ -2,49 +2,13 @@ import { Args, Query, Mutation, Resolver, ID } from '@nestjs/graphql';
 import { Types } from 'mongoose';
 import { UseGuards } from '@nestjs/common';
 import { CreateExpensesInput, UpdateExpensesInput, RemoveExpensesCategoryInput } from './expenses-input.dto';
-import { Expenses, ExpensesForMonth, ExpensesWithCategories, ExpensesByMonth } from './expenses.entity';
+import { Expenses, ExpensesForMonth, ExpensesWithCategories, ExpensesByMonth, ByDayExpenses } from './expenses.entity';
 import { ExpensesService } from './expenses.service';
 import { GqlExpensesGuard } from './expenses.guard';
 
 @Resolver()
 export class ExpensesResolver {
     constructor(private readonly expensesService: ExpensesService) {}
-
-    // @Query(() => Expenses)
-    // async getDayExpense(
-    //     @Args('year', { type: () => Number }) year: number,
-    //     @Args('month', { type: () => Number }) month: number,
-    //     @Args('day', { type: () => Number }) day: number,
-    //     @Args('userId', { type: () => String }) userId: string,
-    //     ) {
-    //   try {
-    //     return await this.expensesService.getDayExpense(
-    //         userId,
-    //         year,
-    //         month,
-    //         day,
-    //         );
-    //   } catch (err) {
-    //     console.error(err);
-    //   }
-    // }
-
-    // @Query(() => [Expenses])
-    // async monthExpenses(
-    //     @Args('year', { type: () => Number }) year: number,
-    //     @Args('month', { type: () => Number }) month: number,
-    //     @Args('userId', { type: () => String }) userId: string,
-    //     ) {
-    //   try {
-    //     return await this.expensesService.getMonthExpense(
-    //         userId,
-    //         year,
-    //         month,
-    //         );
-    //   } catch (err) {
-    //     console.error(err);
-    //   }
-    // }
 
     @Query(() => ExpensesWithCategories)
     @UseGuards(GqlExpensesGuard)
@@ -80,6 +44,24 @@ export class ExpensesResolver {
             userId,
             months,
             year,
+            );
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    @Query(() => ByDayExpenses)
+    @UseGuards(GqlExpensesGuard)
+    async getMonthExpensesByDay(
+        @Args('userId', { type: () => String }) userId: string,
+        @Args('year', { type: () => Number }) year: number,
+        @Args('month', { type: () => Number }) month: number,
+        ) {
+      try {
+        return await this.expensesService.getMonthExpensesByDay(
+            userId,
+            year,
+            month,
             );
       } catch (err) {
         console.error(err);

@@ -20,6 +20,24 @@ export class ExpensesService {
     return total.toString();
   }
 
+  async getMonthExpensesByDay(userId: string, year: number, month: number) {
+    try {
+
+      const expenses = await this.ExpensesModel.find({
+        userId,
+        year,
+        month,
+      }).exec();
+
+      return {
+        byDayExpenses: expenses,
+      };
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   async getMonthExpenses(userId: string, day: number, week: number, year: number, month: number) {
     try {
       const dayExpenses: ExpensesByPeriod = {
@@ -214,33 +232,4 @@ export class ExpensesService {
     }
   }
 
-  // async getDayExpense(
-  //   userId: string,
-  //   year: number,
-  //   month: number,
-  //   day: number,
-  // ) {
-  //   try {
-  //     return await this.ExpensesModel.findOne({
-  //       userId,
-  //       year,
-  //       month,
-  //       day,
-  //     });
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }
-
-  // async getMonthExpense(userId: string, year: number, month: number) {
-  //   try {
-  //     return await this.ExpensesModel.find({
-  //       userId,
-  //       year,
-  //       month,
-  //     }).exec();
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }
 }

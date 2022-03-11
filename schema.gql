@@ -50,6 +50,10 @@ type ExpensesByPeriod {
   expenses: [Expense!]!
 }
 
+type ByDayExpenses {
+  byDayExpenses: [Expenses!]!
+}
+
 type ExpensesForDay {
   total: Float!
   expenses: [Expense!]!
@@ -88,6 +92,7 @@ type Query {
   getCurrentUser(id: String!): User!
   getMonthExpenses(userId: String!, month: Float!, year: Float!, week: Float!, day: Float!): ExpensesWithCategories!
   getByMonthExpenses(userId: String!, months: [Float!]!, year: Float!): ExpensesByMonth!
+  getMonthExpensesByDay(month: Float!, year: Float!, userId: String!): ByDayExpenses!
   getCategories(userId: String!): [Categories!]!
 }
 

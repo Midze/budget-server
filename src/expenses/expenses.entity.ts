@@ -59,7 +59,15 @@ export class ExpensesByPeriod {
 
     @Field(() => [Expense])
     @Prop()
-    expenses?: Expense[]
+    expenses?: Expense[];
+}
+
+@ObjectType()
+@Schema()
+export class ByDayExpenses {
+    @Field(() => [Expenses])
+    @Prop()
+    byDayExpenses: Expenses[];
 }
 
 @ObjectType()
