@@ -17,6 +17,18 @@ export class Expense {
 
 @ObjectType()
 @Schema()
+export class ExpenseWithNumber {
+    @Field(() => String)
+    @Prop()
+    category: string;
+
+    @Field(() => Number)
+    @Prop()
+    price: number;
+}
+
+@ObjectType()
+@Schema()
 export class Expenses {
     @Field(() => String)
     _id: Types.ObjectId;
@@ -138,6 +150,35 @@ export class ExpensesByMonth {
     @Prop({nullable: true})
     categories?: Categories[];
 }
+
+@ObjectType()
+@Schema()
+export class YearExpenses {
+    @Field(() => Number)
+    @Prop()
+    total: number;
+
+    @Field(() => Number)
+    @Prop({nullable: true})
+    year?: number;
+
+    @Field(() => [Expense])
+    @Prop()
+    expenses?: Expense[]
+}
+
+@ObjectType()
+@Schema()
+export class ExpensesByYear {
+    @Field(() => [Categories])
+    @Prop({nullable: true})
+    categories?: Categories[];
+
+    @Field(() => YearExpenses)
+    @Prop()
+    yearExpenses: YearExpenses;
+}
+
 @ObjectType()
 @Schema()
 export class ExpensesWithCategories extends ExpensesForMonth {

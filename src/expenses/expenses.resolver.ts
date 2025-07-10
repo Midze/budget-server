@@ -1,14 +1,31 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { Args, Query, Mutation, Resolver, ID } from '@nestjs/graphql';
 import { Types } from 'mongoose';
 import { UseGuards } from '@nestjs/common';
 import { CreateExpensesInput, UpdateExpensesInput, RemoveExpensesCategoryInput } from './expenses-input.dto';
-import { Expenses, ExpensesForMonth, ExpensesWithCategories, ExpensesByMonth, ByDayExpenses } from './expenses.entity';
+import { Expenses, ExpensesForMonth, ExpensesWithCategories, ExpensesByMonth, ByDayExpenses, ExpensesByYear } from './expenses.entity';
 import { ExpensesService } from './expenses.service';
 import { GqlExpensesGuard } from './expenses.guard';
 
 @Resolver()
 export class ExpensesResolver {
     constructor(private readonly expensesService: ExpensesService) {}
+  
+    @Query(() => ExpensesByYear)
+    @UseGuards(GqlExpensesGuard)
+    async getYearExpenses(
+        @Args('year', { type: () => Number }) year: number,
+        @Args('userId', { type: () => String }) userId: string,
+        ) {
+      try {
+        return await this.expensesService.getYearExpenses(
+            userId,
+            year
+            );
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
     @Query(() => ExpensesWithCategories)
     @UseGuards(GqlExpensesGuard)

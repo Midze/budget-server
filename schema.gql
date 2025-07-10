@@ -78,6 +78,17 @@ type ExpensesByMonth {
   categories: [Categories!]!
 }
 
+type YearExpenses {
+  total: Float!
+  year: Float!
+  expenses: [Expense!]!
+}
+
+type ExpensesByYear {
+  categories: [Categories!]!
+  yearExpenses: YearExpenses!
+}
+
 type ExpensesWithCategories {
   day: ExpensesForDay!
   week: ExpensesByPeriod!
@@ -90,6 +101,7 @@ type Query {
   findAllUsers: [User!]!
   findOne(_id: String!): User!
   getCurrentUser(id: String!): User!
+  getYearExpenses(userId: String!, year: Float!): ExpensesByYear!
   getMonthExpenses(userId: String!, month: Float!, year: Float!, week: Float!, day: Float!): ExpensesWithCategories!
   getByMonthExpenses(userId: String!, months: [Float!]!, year: Float!): ExpensesByMonth!
   getMonthExpensesByDay(month: Float!, year: Float!, userId: String!): ByDayExpenses!

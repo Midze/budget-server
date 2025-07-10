@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { GraphQLError } from 'graphql';
 import { Model, Types } from 'mongoose';
+import { Logger } from '@nestjs/common';
 import { CategoriesService } from 'src/categories/categories.service';
 import { UpdateExpensesInput, CreateExpensesInput, RemoveExpensesCategoryInput } from './expenses-input.dto';
-import { Expense, Expenses, ExpensesByPeriod, ExpensesDocument } from './expenses.entity';
+import { Expense, Expenses, ExpensesByPeriod, ExpensesDocument, ExpenseWithNumber } from './expenses.entity';
 
 @Injectable()
 export class ExpensesService {
@@ -17,7 +18,7 @@ export class ExpensesService {
     const total = expenses.reduce(function(total = 0, expense) {
       return total + Number(expense.price);
     }, 0);
-    return total.toString();
+    return total.toFixed(2);
   }
 
   async getMonthExpensesByDay(userId: string, year: number, month: number) {
@@ -68,20 +69,20 @@ export class ExpensesService {
           currentDayExpensesId = expense._id;
           dayExpenses.expenses = expenses;
           dayExpenses.total = expenses.reduce(function(total = 0, expense) {
-            return total + Number(expense.price);
+            return Number((total + Number(expense.price)).toFixed(2));
           }, 0);
         }
 
         if (expense.week === week) {
           weekExpenses.expenses.push(...expenses);
           weekExpenses.total += expenses.reduce(function(total = 0, expense) {
-            return total + Number(expense.price);
+            return Number((total + Number(expense.price)).toFixed(2));
           }, 0);
         }
         if (expense.month === month) {
           monthExpenses.expenses.push(...expenses);
           monthExpenses.total += expenses.reduce(function(total = 0, expense) {
-            return total + Number(expense.price);
+            return Number((total + Number(expense.price)).toFixed(2));
           }, 0);
         }
 
@@ -141,6 +142,52 @@ export class ExpensesService {
     };
   }
 
+  async getYearExpenses(userId: string, year: number) {
+    const categories = await this.categoriesService.find(userId);
+    const yearExpenses = await this.ExpensesModel.find({
+      userId,
+      year,
+    }).exec();
+    const yearExpensesByCategory: {      
+        total: number,
+        year: number,
+        expenses:  {
+          [key: string]: ExpenseWithNumber
+        }
+    } = {
+      total: 0,
+      year: 0,
+      expenses: {}
+    };
+
+    yearExpensesByCategory.year = year
+
+    yearExpenses.forEach((yearExpense) => {
+      const expenses = yearExpense.expenses;
+      const total = yearExpense.total ? Number(yearExpense.total) : 0;
+      yearExpensesByCategory.total += total;
+      expenses.forEach((expense)=> {
+        if(yearExpensesByCategory.expenses[expense.category]) {
+          yearExpensesByCategory.expenses[expense.category].price += Number(expense.price)
+        } else {
+          yearExpensesByCategory.expenses[expense.category] = {
+            category: expense.category,
+            price: Number(expense.price)
+          }
+        }
+      })      
+     });
+     Logger.debug(yearExpensesByCategory)
+     return {
+       categories,
+       yearExpenses:  {
+        total: yearExpensesByCategory.total,
+        year: yearExpensesByCategory.year,
+        expenses: Object.values(yearExpensesByCategory.expenses)
+      }
+    };
+  }
+
   async updateExpenses(
     _id: Types.ObjectId,
     updateExpenseInput: UpdateExpensesInput,
@@ -170,7 +217,7 @@ export class ExpensesService {
       },
       {
         $set: {
-          "expenses.$[elem].category": "61eafc104b88e154caa58616"
+          "expenses.$[elem].category": "61eafc104b88e154caa58616" // find.name === uncategorized insrtead of id 
         }
       },
       {
