@@ -1,34 +1,31 @@
-# You can use any Node version you like, see the full list of available versions:
-# https://hub.docker.com/_/node
-FROM node:14-alpine
-ENV DB_PASS=$DB_PASS
-ENV DB_USER=$DB_USER
-ADD package.json /tmp/package.json
+FROM node:22-bookworm-slim AS build
 
-RUN rm -rf dist
-
-# Install dependancies with npm
-RUN cd /tmp && npm install
-
-# Copy all files to the /src directory
-ADD ./ /src
-
-## Remove the node_modules folder in /src and copy the new node_modules folder to /src
-RUN rm -rf /src/node_modules && cp -a /tmp/node_modules /src/
-
-# Define working directory
 WORKDIR /src
 
-# Run the build script
-RUN npm run-script build
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ \
+  && rm -rf /var/lib/apt/lists/*
 
-#Optional: Install pm2 globally
-# Docs: https://pm2.keymetrics.io/
-RUN npm install pm2 -g
+COPY package*.json ./
+RUN npm ci
 
-#Expose port 300 where the qapplication will run
+COPY . .
+RUN npm run build
+RUN npm prune --omit=dev
+
+FROM node:22-bookworm-slim AS runtime
+
+WORKDIR /src
+
+ENV NODE_ENV=production
+
+COPY --from=build /src/package*.json ./
+COPY --from=build /src/node_modules ./node_modules
+COPY --from=build /src/dist ./dist
+COPY --from=build /src/process.json ./process.json
+
+RUN npm install -g pm2
+
 EXPOSE 3000
 
-# Start the application with pm2
-# You can also start it with just node
 CMD ["pm2-runtime", "process.json"]

@@ -96,6 +96,65 @@ type ExpensesWithCategories {
   categories: [Categories!]!
 }
 
+type ReceiptStoredItem {
+  name: String!
+  price: String!
+  categoryId: String
+  categoryName: String
+}
+
+type ReceiptRecord {
+  _id: String!
+  userId: String!
+  originalFileName: String!
+  fileHash: String
+  storedFileName: String!
+  fileType: String!
+  fileSizeBytes: Float!
+  status: String!
+  merchantName: String
+  detectedMerchantName: String
+  receiptDate: String
+  detectedReceiptDate: String
+  selectedDateAtUpload: String
+  effectiveExpenseDate: String
+  total: String
+  detectedTotal: String
+  items: [ReceiptStoredItem!]!
+  errorMessage: String
+  createdAt: String
+  updatedAt: String
+}
+
+type ReceiptItem {
+  name: String!
+  price: String!
+  categoryId: String
+  categoryName: String
+}
+
+type ProcessReceiptResult {
+  receiptId: String
+  isDuplicate: Boolean!
+  merchantName: String
+  receiptDate: String
+  effectiveExpenseDate: String
+  total: String
+  items: [ReceiptItem!]!
+}
+
+type ReceiptActionResult {
+  success: Boolean!
+  message: String
+  receipt: ReceiptRecord
+}
+
+type GlossaryEntry {
+  _id: String!
+  phrase: String!
+  categoryId: String!
+}
+
 type Query {
   getHello: String!
   findAllUsers: [User!]!
@@ -106,6 +165,8 @@ type Query {
   getByMonthExpenses(userId: String!, months: [Float!]!, year: Float!): ExpensesByMonth!
   getMonthExpensesByDay(month: Float!, year: Float!, userId: String!): ByDayExpenses!
   getCategories(userId: String!): [Categories!]!
+  getReceipts(userId: String!): [ReceiptRecord!]!
+  getReceipt(userId: String!, receiptId: String!): ReceiptRecord!
 }
 
 type Mutation {
@@ -120,6 +181,12 @@ type Mutation {
   addExpensesTotat(_id: String!): Expenses!
   createCategory(createCategoryInput: CreateCategoryInput!): Categories!
   removeCategory(userId: String!, id: [String!]!): [Categories!]!
+  processReceipt(processReceiptInput: ProcessReceiptInput!): ProcessReceiptResult!
+  updateReceipt(updateReceiptInput: UpdateReceiptInput!, userId: String!): ReceiptRecord!
+  confirmReceipt(receiptActionInput: ReceiptActionInput!, userId: String!): ReceiptActionResult!
+  reprocessReceipt(receiptActionInput: ReceiptActionInput!, userId: String!): ReceiptRecord!
+  deleteReceipt(receiptActionInput: ReceiptActionInput!, userId: String!): ReceiptActionResult!
+  upsertGlossaryEntries(entries: [GlossaryEntryInput!]!): [GlossaryEntry!]!
 }
 
 input CreateUserInput {
@@ -165,4 +232,37 @@ input CreateCategoryInput {
   userId: String!
   name: String!
   childOf: String
+}
+
+input ProcessReceiptInput {
+  userId: String!
+  fileBase64: String!
+  fileType: String!
+  fileName: String
+  selectedDate: String
+}
+
+input UpdateReceiptInput {
+  receiptId: String!
+  merchantName: String
+  receiptDate: String
+  effectiveExpenseDate: String
+  total: String
+  items: [ReceiptStoredItemInput!]
+}
+
+input ReceiptStoredItemInput {
+  name: String!
+  price: String!
+  categoryId: String
+  categoryName: String
+}
+
+input ReceiptActionInput {
+  receiptId: String!
+}
+
+input GlossaryEntryInput {
+  phrase: String!
+  categoryId: String!
 }

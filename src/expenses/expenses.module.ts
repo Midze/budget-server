@@ -11,5 +11,6 @@ import { ExpensesService } from './expenses.service';
     CategoriesModule,
   ],
   providers: [ExpensesResolver, ExpensesService],
+  exports: [ExpensesService],
 })
 export class ExpensesModule {}

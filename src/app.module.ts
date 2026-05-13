@@ -7,19 +7,21 @@ import { UserModule } from './user/user.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ConfigModule } from '@nestjs/config';
+import { ReceiptModule } from './receipt/receipt.module';
+import { GlossaryModule } from './glossary/glossary.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({}), 
-    MongooseModule.forRoot(
-      `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.wvxan.mongodb.net/budget?retryWrites=true&w=majority`,
-      ),
+    MongooseModule.forRoot(process.env.MONO_DB_CONNECTION_STRING),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
     }),
     UserModule,
     ExpensesModule,
     CategoriesModule,
+    ReceiptModule,
+    GlossaryModule,
   ],
   providers: [AppService, AppResolver],
 })

@@ -6,9 +6,12 @@ import { CreateUserInput, UpdateUserInput } from './user-inputs.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { GraphQLError } from 'graphql';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     private jwtService: JwtService,
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
@@ -24,12 +27,14 @@ export class UserService {
 
   async createUser(createUserInput: CreateUserInput) {
     try {
+      const normalizedEmail = this.normalizeEmail(createUserInput.email);
       const isUser = await this.UserModel.findOne({
-        email: createUserInput.email,
+        email: normalizedEmail,
       });
       if (isUser) {
         return new GraphQLError('Nah bro you already exist');
       } else {
+        createUserInput.email = normalizedEmail;
         createUserInput.password = await bcrypt
           .hash(createUserInput.password, 10)
           .then((r) => r);
@@ -42,12 +47,22 @@ export class UserService {
 
   async login({ password, email }) {
     try {
-      const user = await this.UserModel.findOne({ email });
-      return user && (await bcrypt.compare(password, user.password))
+      const normalizedEmail = this.normalizeEmail(email);
+      this.logger.log(`Login attempt for ${normalizedEmail}`);
+      const user = await this.UserModel.findOne({ email: normalizedEmail });
+      if (!user) {
+        this.logger.warn(`Login failed for ${normalizedEmail}: user not found`);
+        return new GraphQLError('Nah homie, wrong password/email');
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      this.logger.log(`Login password check for ${normalizedEmail}: ${isPasswordValid ? 'ok' : 'failed'}`);
+
+      return isPasswordValid
         ? {
-          token: await this.jwtService.signAsync({ email, _id: user._id }),
-          user,
-        }
+            token: await this.jwtService.signAsync({ email: normalizedEmail, _id: user._id }),
+            user,
+          }
         : new GraphQLError('Nah homie, wrong password/email');
     } catch (err) {
       console.error(err);
@@ -98,5 +113,9 @@ export class UserService {
     } catch (err) {
       console.error(err);
     }
+  }
+
+  private normalizeEmail(email: string) {
+    return String(email || '').trim().toLowerCase();
   }
 }

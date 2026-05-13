@@ -21,6 +21,25 @@ export class ExpensesService {
     return total.toFixed(2);
   }
 
+  mergeExpensesByCategory(existingExpenses: Expense[], incomingExpenses: Expense[]): Expense[] {
+    const totalsByCategory = new Map<string, number>();
+
+    [...existingExpenses, ...incomingExpenses].forEach((expense) => {
+      const categoryId = String(expense.category || '').trim();
+      if (!categoryId) {
+        return;
+      }
+
+      const nextValue = Number(String(expense.price).replace(',', '.')) || 0;
+      totalsByCategory.set(categoryId, (totalsByCategory.get(categoryId) || 0) + nextValue);
+    });
+
+    return Array.from(totalsByCategory.entries()).map(([category, price]) => ({
+      category,
+      price: price.toFixed(2),
+    }));
+  }
+
   async getMonthExpensesByDay(userId: string, year: number, month: number) {
     try {
 
@@ -253,6 +272,41 @@ export class ExpensesService {
     catch (err) {
       console.error(err);
     }
+  }
+
+  getWeekNumber(date: Date): number {
+    const tempDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = tempDate.getUTCDay() || 7;
+    tempDate.setUTCDate(tempDate.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(tempDate.getUTCFullYear(), 0, 1));
+    return Math.ceil(((tempDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  }
+
+  async upsertExpensesForDate(userId: string, date: Date, expenses: Expense[]) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const week = this.getWeekNumber(date);
+    const total = this.getDayTota(expenses);
+
+    const existing = await this.ExpensesModel.findOne({ userId, year, month, day, week }).exec();
+    if (existing) {
+      const mergedExpenses = this.mergeExpensesByCategory(existing.expenses || [], expenses);
+      existing.expenses = mergedExpenses;
+      existing.total = this.getDayTota(mergedExpenses);
+      await existing.save();
+      return existing;
+    }
+
+    return new this.ExpensesModel({
+      userId,
+      year,
+      month,
+      day,
+      week,
+      expenses,
+      total,
+    }).save();
   }
 
   async addExpensesTotat(_id: Types.ObjectId) {
