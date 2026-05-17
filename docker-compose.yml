@@ -1,16 +1,16 @@
-version: '3.7'
 services:
   budget-server:
     container_name: budget-server
+    image: ghcr.io/midze/budget-server:latest
     environment:
       - NODE_ENV=production
       - RECEIPT_STORAGE_DIR=/data/receipts
     env_file:
       - .env
-    build:
-      context: ./
-    image: budget-server
     ports:
       - '127.0.0.1:3000:3000'
     volumes:
       - /var/lib/budget/receipts:/data/receipts
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
