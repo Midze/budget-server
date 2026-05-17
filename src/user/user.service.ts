@@ -56,11 +56,18 @@ export class UserService {
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
-      this.logger.log(`Login password check for ${normalizedEmail}: ${isPasswordValid ? 'ok' : 'failed'}`);
+      this.logger.log(
+        `Login password check for ${normalizedEmail}: ${
+          isPasswordValid ? 'ok' : 'failed'
+        }`,
+      );
 
       return isPasswordValid
         ? {
-            token: await this.jwtService.signAsync({ email: normalizedEmail, _id: user._id }),
+            token: await this.jwtService.signAsync({
+              email: normalizedEmail,
+              _id: user._id,
+            }),
             user,
           }
         : new GraphQLError('Nah homie, wrong password/email');
@@ -116,6 +123,8 @@ export class UserService {
   }
 
   private normalizeEmail(email: string) {
-    return String(email || '').trim().toLowerCase();
+    return String(email || '')
+      .trim()
+      .toLowerCase();
   }
 }
