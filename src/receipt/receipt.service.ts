@@ -294,7 +294,9 @@ export class ReceiptService {
       'Extract receipt merchantName, receiptDate in YYYY-MM-DD if possible, total, and each purchased item as name and price. ' +
       'Match each item to a category from the list if possible. Prefer the most specific child category. ' +
       'Also use glossary mappings when matching items. ' +
-      'Return strict JSON only: {"merchantName":"...","receiptDate":"YYYY-MM-DD|null","total":"0.00|null","items":[{"name":"...","price":"0.00","categoryId":"<id>|null","categoryName":"<name>|null"}]}. ' +
+      'Return strict JSON only: {"merchantName":"...","receiptDate":null,"total":null,"items":[{"name":"...","price":"0.00","categoryId":null,"categoryName":null}]}. ' +
+      'For matched items, replace categoryId and categoryName with the exact id and name from Categories. ' +
+      'Use JSON null when no category matches. Never combine an id and name in one field. ' +
       `Categories: ${JSON.stringify(categoryList)}. Glossary: ${JSON.stringify(
         glossaryList,
       )}`;
@@ -372,7 +374,9 @@ export class ReceiptService {
         merchantName: parsed.merchantName ?? null,
         receiptDate: parsed.receiptDate ?? null,
         total: parsed.total ?? null,
-        items: items.map((item) => this.normalizeReceiptItem(item)),
+        items: items.map((item) =>
+          this.normalizeParsedReceiptItem(item, categoryList),
+        ),
       };
     } catch (error) {
       throw new GraphQLError(this.getErrorMessage(error));
@@ -409,6 +413,44 @@ export class ReceiptService {
       price: String(item?.price ?? '0.00').trim() || '0.00',
       categoryId: item?.categoryId ?? null,
       categoryName: item?.categoryName ?? null,
+    };
+  }
+
+  private normalizeParsedReceiptItem(
+    item: ReceiptStoredItemInput | any,
+    categories: Array<{ id: string; name: string }>,
+  ) {
+    const normalizedItem = this.normalizeReceiptItem(item);
+    const rawCategoryId = String(normalizedItem.categoryId || '').trim();
+    const categoryIdWithoutSuffix = rawCategoryId.split('|')[0].trim();
+    const normalizedCategoryName = String(
+      normalizedItem.categoryName || '',
+    )
+      .trim()
+      .toLocaleLowerCase();
+
+    const matchedCategory =
+      categories.find(
+        (category) =>
+          category.id === rawCategoryId ||
+          category.id === categoryIdWithoutSuffix,
+      ) ||
+      categories.find(
+        (category) =>
+          category.name.trim().toLocaleLowerCase() === normalizedCategoryName,
+      );
+
+    if (!matchedCategory) {
+      return {
+        ...normalizedItem,
+        categoryId: null,
+      };
+    }
+
+    return {
+      ...normalizedItem,
+      categoryId: matchedCategory.id,
+      categoryName: matchedCategory.name,
     };
   }
 
