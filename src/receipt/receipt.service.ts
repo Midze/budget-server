@@ -81,13 +81,36 @@ export class ReceiptService {
       })
       .exec();
 
-    const fileBuffer = await fs.readFile(this.getReceiptFilePath(receipt));
-    const base64 = fileBuffer.toString('base64');
-    const parsed = await this.extractReceiptData({
-      userId,
-      fileBase64: base64,
-      fileType: receipt.fileType,
-    });
+    let parsed: {
+      merchantName: string | null;
+      receiptDate: string | null;
+      total: string | null;
+      items: Array<{
+        name: string;
+        price: string;
+        categoryId?: string | null;
+        categoryName?: string | null;
+      }>;
+    };
+
+    try {
+      const fileBuffer = await fs.readFile(this.getReceiptFilePath(receipt));
+      const base64 = fileBuffer.toString('base64');
+      parsed = await this.extractReceiptData({
+        userId,
+        fileBase64: base64,
+        fileType: receipt.fileType,
+      });
+    } catch (error) {
+      const message = this.getErrorMessage(error);
+      await this.receiptModel
+        .findByIdAndUpdate(receipt._id, {
+          status: RECEIPT_STATUSES.FAILED,
+          errorMessage: message,
+        })
+        .exec();
+      throw new GraphQLError(message);
+    }
 
     const effectiveExpenseDate =
       parsed.receiptDate ||
@@ -233,6 +256,7 @@ export class ReceiptService {
     if (!apiKey) {
       throw new GraphQLError('OPENAI_API_KEY is not set on the server');
     }
+    const model = process.env.OPENAI_RECEIPT_MODEL || 'gpt-4.1-mini';
 
     const isImage = input.fileType?.startsWith('image/');
     const isPdf = input.fileType === 'application/pdf';
@@ -324,7 +348,7 @@ export class ReceiptService {
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {
-          model: 'gpt-5.4-nano',
+          model,
           messages,
           temperature: 0.1,
         },
@@ -351,13 +375,17 @@ export class ReceiptService {
         items: items.map((item) => this.normalizeReceiptItem(item)),
       };
     } catch (error) {
-      const message =
-        error?.response?.data?.error?.message ||
-        error?.response?.data ||
-        error?.message ||
-        error;
-      throw new GraphQLError(String(message || 'Failed to process receipt'));
+      throw new GraphQLError(this.getErrorMessage(error));
     }
+  }
+
+  private getErrorMessage(error: any) {
+    const message =
+      error?.response?.data?.error?.message ||
+      error?.response?.data ||
+      error?.message ||
+      error;
+    return String(message || 'Failed to process receipt');
   }
 
   private toProcessResult(
