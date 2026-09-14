@@ -352,7 +352,6 @@ export class ReceiptService {
         {
           model,
           messages,
-          temperature: 0.1,
         },
         {
           headers: {

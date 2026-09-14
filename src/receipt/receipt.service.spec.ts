@@ -104,4 +104,33 @@ describe('ReceiptService category matching', () => {
     expect(result.items[0].categoryId).toBe(foodCategory._id);
     expect(result.items[0].categoryName).toBe(foodCategory.name);
   });
+
+  it('does not send a custom temperature to the receipt model', async () => {
+    (axios.post as jest.Mock).mockResolvedValue({
+      data: {
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                merchantName: 'Test',
+                receiptDate: null,
+                total: null,
+                items: [],
+              }),
+            },
+          },
+        ],
+      },
+    } as any);
+
+    await (service as any).extractReceiptData({
+      userId: 'user-id',
+      fileBase64: 'AA==',
+      fileType: 'image/jpeg',
+    });
+
+    expect((axios.post as jest.Mock).mock.calls[0][1]).not.toHaveProperty(
+      'temperature',
+    );
+  });
 });
