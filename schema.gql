@@ -155,6 +155,15 @@ type GlossaryEntry {
   categoryId: String!
 }
 
+type CategoryLimit {
+  categoryId: String!
+  name: String!
+  childOf: String
+  monthlyLimit: Float
+  defaultLimit: Float
+  isOverride: Boolean!
+}
+
 type Query {
   getHello: String!
   findAllUsers: [User!]!
@@ -167,6 +176,7 @@ type Query {
   getCategories(userId: String!): [Categories!]!
   getReceipts(userId: String!): [ReceiptRecord!]!
   getReceipt(userId: String!, receiptId: String!): ReceiptRecord!
+  getCategoryLimits(month: Int!, year: Int!): [CategoryLimit!]!
 }
 
 type Mutation {
@@ -187,6 +197,7 @@ type Mutation {
   reprocessReceipt(receiptActionInput: ReceiptActionInput!, userId: String!): ReceiptRecord!
   deleteReceipt(receiptActionInput: ReceiptActionInput!, userId: String!): ReceiptActionResult!
   upsertGlossaryEntries(entries: [GlossaryEntryInput!]!): [GlossaryEntry!]!
+  saveCategoryLimits(changes: [CategoryLimitChange!]!, scope: String!, month: Int!, year: Int!): [CategoryLimit!]!
 }
 
 input CreateUserInput {
@@ -265,4 +276,10 @@ input ReceiptActionInput {
 input GlossaryEntryInput {
   phrase: String!
   categoryId: String!
+}
+
+input CategoryLimitChange {
+  categoryId: String!
+  monthlyLimit: Float
+  resetToDefault: Boolean
 }

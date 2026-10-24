@@ -26,6 +26,22 @@ export class ReceiptController {
     const receipt = await this.receiptService.getReceiptForUser(id, userId);
     res.setHeader('Content-Type', receipt.fileType || 'application/octet-stream');
     res.setHeader('Content-Disposition', `inline; filename="${receipt.originalFileName}"`);
-    return createReadStream(this.receiptService.getReceiptFilePath(receipt)).pipe(res);
+
+    const stream = createReadStream(this.receiptService.getReceiptFilePath(receipt));
+    stream.on('error', (error: NodeJS.ErrnoException) => {
+      if (res.headersSent) {
+        res.destroy();
+        return;
+      }
+
+      if (error.code === 'ENOENT') {
+        res.status(404).json({ message: 'Receipt file not found' });
+        return;
+      }
+
+      res.status(500).json({ message: 'Unable to read receipt file' });
+    });
+
+    return stream.pipe(res);
   }
 }

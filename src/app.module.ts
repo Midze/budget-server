@@ -9,11 +9,12 @@ import { CategoriesModule } from './categories/categories.module';
 import { ConfigModule } from '@nestjs/config';
 import { ReceiptModule } from './receipt/receipt.module';
 import { GlossaryModule } from './glossary/glossary.module';
+import { CategoryLimitsModule } from './category-limits/category-limits.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({}), 
-    MongooseModule.forRoot(process.env.MONO_DB_CONNECTION_STRING),
+    ConfigModule.forRoot({}),
+    MongooseModule.forRoot(process.env.MONGO_DB_CONNECTION_STRING),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
     }),
@@ -22,6 +23,7 @@ import { GlossaryModule } from './glossary/glossary.module';
     CategoriesModule,
     ReceiptModule,
     GlossaryModule,
+    CategoryLimitsModule,
   ],
   providers: [AppService, AppResolver],
 })
